@@ -80,8 +80,6 @@ nodejs-local-auth
 nodejs-speech
 nodejs-analytics-admin
 cloud-debug-nodejs
-sloth
-release-please
 nodejs-recommender
 nodejs-datacatalog
 gcp-metadata
@@ -91,16 +89,13 @@ nodejs-memcache
 nodejs-redis"
 
 for f in $FOLDERS; do
-    echo "Processing $f"
-    echo "# Format: //devtools/kokoro/config/proto/job.proto
+  sed -i 's/chain_spec/group_spec/' $f/publish.cfg
+  sed -i "s/threshold: SUCCESS/child_job_name: \"cloud-devrel/client-libraries/nodejs/release/googleapis/$f/docs-devsite\"/" $f/publish.cfg
 
-# Job for publishing ref docs to cloud.google.com
+  sed -i 's/chain_spec/group_spec/' $f/docs.cfg
 
-scm {
-  github_scm {
-    repository: \"$f\"
-    name: \"$f\"
-  }
-}" >>$f/docs-devsite.cfg
-
+  echo "group_spec {
+  parent_job_name: \"cloud-devrel/client-libraries/nodejs/release/googleapis/$f/publish\"
+}" >> $f/docs-devsite.cfg
+    
 done
