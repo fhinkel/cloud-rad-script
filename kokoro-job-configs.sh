@@ -137,15 +137,10 @@ teeny-request"
 for f in $FOLDERS; do
   echo "Processing $f"
   
-  sed -i 's/chain_spec/group_spec/' $f/publish.cfg
-  sed -i "s|threshold: SUCCESS|child_job_name: \"cloud-devrel/client-libraries/nodejs/release/googleapis/$f/docs-devsite\"|" $f/publish.cfg
-
-  sed -i 's/chain_spec/group_spec/' $f/docs.cfg
-
-  # Generate docs-devsite.cfg
   echo "# Format: //devtools/kokoro/config/proto/job.proto
 
-# Job for publishing ref docs to cloud.google.com
+# Job for publishing up-to-date docs.
+
 scm {
   github_scm {
     repository: \"$f\"
@@ -153,8 +148,28 @@ scm {
   }
 }
 
-group_spec {
+chain_spec {
   parent_job_name: \"cloud-devrel/client-libraries/nodejs/release/googleapis/$f/publish\"
+
+  child_job_name: \"cloud-devrel/client-libraries/nodejs/release/googleapis/$f/docs-devsite\"
+  threshold: SUCCESS
+}
+" > $f/docs.cfg
+
+  # Generate docs-devsite.cfg
+  echo "# Format: //devtools/kokoro/config/proto/job.proto
+
+# Job for publishing ref docs to cloud.google.com
+
+scm {
+  github_scm {
+    repository: \"$f\"
+    name: \"$f\"
+  }
+}
+
+chain_spec {
+  parent_job_name: \"cloud-devrel/client-libraries/nodejs/release/googleapis/$f/docs\"
 }" > $f/docs-devsite.cfg
     
 done
