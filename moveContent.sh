@@ -1,5 +1,9 @@
 #!/bin/bash -i
 set -e
+
+# Move content from the branch into main on g3
+
+# get content from _gen_toc.yaml file on the branch
 FOLDERS="bigquery-data-transfer
 bigquery-reservation
 bigquery-storage
@@ -98,7 +102,6 @@ web-risk
 web-security-scanner
 workflows"
 
-PARENT="googledata/devsite/site-cloud/en/java/docs/reference"
 BRANCH="cloud-rad-nodejs_branch"
 CITC_BASE="move-nodejs-content"
 cl=1
@@ -121,9 +124,9 @@ DISABLE_TYPOGRAPHIC_CHECK=Generated docs.
 IGNORE_TITLE_CHECKS=Generated docs.
 NO_CHECK_INTERNAL_RESOURCE=OK links" -b 187401643 -m tbp
 
-    # -q suppressed interactive prompts
+    # -q suppresses interactive prompts
     g4 mail  --autodeleteclient -q  
     
-    # Increase id for next CL 
+    # Increase id for next workspace 
     cl=$((cl+1))
 done
