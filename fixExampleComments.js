@@ -38,7 +38,8 @@ function parseSamples(content) {
       sampleCache.set(key, sample);
       inTag = false;
     } else if (inTag) {
-      sample += `${line}\n`;
+      const escapedLine = line.replace('*/', '*\\/');
+      sample += `${escapedLine}\n`;
     } else {
       const match = line.match(REGION_START_REGEX);
       if (match) {
