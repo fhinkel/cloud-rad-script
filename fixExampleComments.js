@@ -91,6 +91,7 @@ async function processLineByLine(file) {
     const includeTag = /^(\s*)\* @example <caption>include:/;
     let match = line.match(includeTag);
     if (match) {
+      data.push(line); // skip include tags for now
       insideIncludeBlock = true;
       continue;
     }
@@ -99,7 +100,7 @@ async function processLineByLine(file) {
     const include = line.match(regionTag)
     if(insideIncludeBlock && include) {
       const whitespace = include[1];
-      // data.push(whitespace + codeExampleFencing);
+      data.push(line);
       const key = include[2];
       if (sampleCache.size === 0) {
         loadSampleCache();
@@ -125,11 +126,11 @@ async function processLineByLine(file) {
       }
 
       // write the intro and includeSample
-      data.push('* @example');
+      // data.push('* @example');
       data.push(line);
-      data.push(codeExampleFencing);
-      data.push(includeSample);
-      data.push(codeExampleFencing);
+      // data.push(codeExampleFencing);
+      // data.push(includeSample);
+      // data.push(codeExampleFencing);
 
       continue;
     }
