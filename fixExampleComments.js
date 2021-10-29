@@ -69,13 +69,10 @@ async function processLineByLine(file) {
 
   const data = [];
   let insideExampleBlock = false;
-  let insideIncludeBlock = false;
-  let noSample = false;
-  let includeSample = '';
   const codeExampleFencing = '* ```';
 
 
-  for await (const line of rl) {
+  for await (let line of rl) {
     if (insideExampleBlock) {
       const openingTagOrEndComment = /^(\s*)\*( @|\/)/;
       const match = line.match(openingTagOrEndComment);
@@ -92,58 +89,28 @@ async function processLineByLine(file) {
     let match = line.match(includeTag);
     if (match) {
       data.push(line); // skip include tags for now
-      insideIncludeBlock = true;
       continue;
     }
 
-    const regionTag = /^(\s*)\* region_tag:(.*)$/;
-    const include = line.match(regionTag)
-    if(insideIncludeBlock && include) {
-      const whitespace = include[1];
-      data.push(line);
-      const key = include[2];
-      if (sampleCache.size === 0) {
-        loadSampleCache();
-      }
-      includeSample = sampleCache.get(key);
-      if (!includeSample) {
-        console.warn(`could not find sample ${key}`);
-        noSample = true;
-      } else {
-        noSample = false;
-        continue;
-      }
-    }
-
-    // handle the intro after an include tag. 
-    if(insideIncludeBlock && !include) {
-      insideIncludeBlock = false;
-      
-
-      if(noSample) {
-        // Couldn't find the included sample, move on. 
-        continue;
-      }
-
-      // write the intro and includeSample
-      // data.push('* @example');
-      data.push(line);
-      // data.push(codeExampleFencing);
-      // data.push(includeSample);
-      // data.push(codeExampleFencing);
-
-      continue;
-    }
-
-    data.push(line);
-    const exampleTag = /^(\s*)\* @example$/;
+    const exampleTag = /^(\s*)\* @example/;
     match = line.match(exampleTag);
     if (match) {
       insideExampleBlock = true;
       const whitespace = match[1];
-      //   console.log(line);
-      //   console.log(whitespace + codeExampleFencing + '###');
+      const captionTag = line.match(/<caption>/);
+      if(captionTag) {
+        console.log('found a caption');
+        const closingCaptionTag = line.match(/<\/caption>/);
+        if(!closingCaptionTag) {
+          throw new Error(`closing caption missing: ${line}`);
+        }
+        line = line.replace(/<\/?caption>/g, '');
+        console.log(line);
+      }
+      data.push(line);
       data.push(whitespace + codeExampleFencing);
+    } else {
+      data.push(line);
     }
   }
 
