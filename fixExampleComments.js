@@ -99,13 +99,11 @@ async function processLineByLine(file) {
       const whitespace = match[1];
       const captionTag = line.match(/<caption>/);
       if(captionTag) {
-        console.log('found a caption');
         const closingCaptionTag = line.match(/<\/caption>/);
         if(!closingCaptionTag) {
           throw new Error(`closing caption missing: ${line}`);
         }
         line = line.replace(/<\/?caption>/g, '');
-        console.log(line);
       }
       data.push(line);
       data.push(whitespace + codeExampleFencing);
@@ -119,7 +117,7 @@ async function processLineByLine(file) {
 }
 
 const main = async () => {
-  const path = 'src';
+  const path = 'src/';
   const { readdir } = fs.promises;
   try {
     const files = await readdir(path);
