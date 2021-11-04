@@ -49,7 +49,6 @@ async function processLineByLine(file) {
     match = line.match(/^\s*([A-z]+)\(/); // functionName(
     if(match) {
       functionName = match[1];
-      console.log("Function: " + functionName);
       match  = line.match(/^\s*([A-z]+)\(.*;|{$/); // functionName(   ending with ; or {
       if(match) {
         // console.log(line);
@@ -78,31 +77,24 @@ async function processLineByLine(file) {
   }
 
   let res = [];
-  let currentComment = [];
+  let currentSignatures = [];
   for(const entry of data) {
     if(entry.type === "none") {
-      if(currentComment.length !== 0) {
-        res = [...res, ...currentComment];
-        currentComment = [];
-      }
       res.push(entry.data);
     }
     if(entry.type === "comment") {
-      currentComment = [...currentComment, ...entry.data];
+      res = [...res, ...entry.data];
     }
     if(entry.type === "signature") {
+        currentSignatures = [...currentSignatures, ...entry.data];
       if(!entry.declaration) {
-        console.log("not a declaration " + entry.name);
-        // console.log(currentComment)
-        res = [...res, ...currentComment];
-        currentComment = [];
+        // console.log("implementation " + entry.name);
+        res = [...res, ...currentSignatures];
+        currentSignatures = [];
       } 
-      res = [...res, ...entry.data];
-
-
     }
-
   }
+
   // fs.writeFileSync("tmp.js", res.join('\n'), 'utf-8');
   fs.writeFileSync(file, res.join('\n'), 'utf-8');
 
@@ -119,7 +111,7 @@ const main = async () => {
       const stat = statSync(file);
       if (!stat.isFile()) continue;
       processLineByLine(file);
-      break; // only do one file
+      // break; // only do one file
     }
   } catch (err) {
     console.error(err);
