@@ -123,10 +123,6 @@ for repo in ${repos[*]}; do
 stubby call blade:kokoro-api KokoroApi.Build <<EOF   
 full_job_name: "cloud-devrel/client-libraries/nodejs/release/googleapis/${repo}/docs-devsite"
 wait_until_started: false                                             
-# env_vars {
-#     key: "VERSION"
-#     value: "v3.1.0"         
-# }
 EOF
 done
 
