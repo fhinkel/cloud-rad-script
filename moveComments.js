@@ -25,73 +25,79 @@ async function processLineByLine(file) {
     let match = line.match(/^\s*\/\*\*/); // /** 
     if (match) {
       // starting a comment
-      insideComment = true;
       comment = [];
       comment.push(line);
+      insideComment = true;
+
+      let oneLineComment = line.match(/\*\/$/); // */
+      if (oneLineComment) {
+        insideComment = false;
+        data.push({ type: "comment", data: comment });
+      }
       continue;
     }
 
     if (insideComment) {
       match = line.match(/^\s*\*/); //  *
-      if(!match) {
+      if (!match) {
         throw new Error("expected a comment");
       }
       comment.push(line);
       match = line.match(/^\s*\*\//); //  */
-      if(match) {
+      if (match) {
         // end a comment
         insideComment = false;
-        data.push({type: "comment", data: comment});
+        data.push({ type: "comment", data: comment });
       }
       continue;
     }
 
     match = line.match(/^\s*([A-z]+)\(/); // functionName(
-    if(match) {
+    if (match) {
       functionName = match[1];
-      match  = line.match(/^\s*([A-z]+)\(.*;|{$/); // functionName(   ending with ; or {
-      if(match) {
+      match = line.match(/^\s*([A-z]+)\(.*;|{$/); // functionName(   ending with ; or {
+      if (match) {
         // console.log(line);
-        match = line.match(/;$/); 
-        data.push({type: "signature", declaration: match?true:false, name: functionName, data: [line]});
+        match = line.match(/;$/);
+        data.push({ type: "signature", declaration: match ? true : false, name: functionName, data: [line] });
       } else {
         insideSignature = true;
         signature.push(line);
       }
       continue;
     }
-    if(insideSignature) {
+    if (insideSignature) {
       signature.push(line);
       match = line.match(/;|{$/); // ending with ; or { 
-      if(match) {
+      if (match) {
         // console.log(signature);
-        match = line.match(/;$/); 
-        data.push({type: "signature", declaration: match?true:false, name: functionName, data: signature});
+        match = line.match(/;$/);
+        data.push({ type: "signature", declaration: match ? true : false, name: functionName, data: signature });
         insideSignature = false;
         signature = [];
       }
       continue;
     }
 
-    data.push({type: "none", data: line});
+    data.push({ type: "none", data: line });
   }
 
   let res = [];
   let currentSignatures = [];
-  for(const entry of data) {
-    if(entry.type === "none") {
+  for (const entry of data) {
+    if (entry.type === "none") {
       res.push(entry.data);
     }
-    if(entry.type === "comment") {
+    if (entry.type === "comment") {
       res = [...res, ...entry.data];
     }
-    if(entry.type === "signature") {
-        currentSignatures = [...currentSignatures, ...entry.data];
-      if(!entry.declaration) {
+    if (entry.type === "signature") {
+      currentSignatures = [...currentSignatures, ...entry.data];
+      if (!entry.declaration) {
         // console.log("implementation " + entry.name);
         res = [...res, ...currentSignatures];
         currentSignatures = [];
-      } 
+      }
     }
   }
 
