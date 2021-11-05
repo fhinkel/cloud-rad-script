@@ -113,8 +113,8 @@ async function processLineByLine(file) {
 
   res.push('');
 
-  fs.writeFileSync("tmp.js", res.join('\n'), 'utf-8');
-  // fs.writeFileSync(file, res.join('\n'), 'utf-8');
+  // fs.writeFileSync("tmp.js", res.join('\n'), 'utf-8');
+  fs.writeFileSync(file, res.join('\n'), 'utf-8');
 
 }
 
@@ -128,7 +128,7 @@ const main = async () => {
     for (const file of files) {
       const stat = statSync(file);
       if (!stat.isFile()) continue;
-      if(file !== 'src/v1/instance_admin_client.ts') continue;
+      // if(file !== 'src/v1/instance_admin_client.ts') continue;
       processLineByLine(file);
     }
   } catch (err) {
