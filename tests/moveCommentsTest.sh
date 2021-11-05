@@ -1,5 +1,10 @@
 #!bash
 
+
+# Edit the moveComments.js script to only generate one file and write output
+# to tmp.js instead of the same file. If everything goes well, the diff
+# output from this test will be empty
+
 cd ../all-repos/nodejs-spanner
 node ../../cloud-rad-script/moveComments.js
 
