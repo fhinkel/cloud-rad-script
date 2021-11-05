@@ -92,6 +92,10 @@ async function processLineByLine(file) {
   let currentSignatures = [];
   for (const entry of data) {
     if (entry.type === "none") {
+      if(currentSignatures.length !== 0) {
+        res = [...res, ...currentSignatures];
+        currentSignatures = [];
+      }
       res.push(entry.data);
     }
     if (entry.type === "comment") {
@@ -109,8 +113,8 @@ async function processLineByLine(file) {
 
   res.push('');
 
-  // fs.writeFileSync("tmp.js", res.join('\n'), 'utf-8');
-  fs.writeFileSync(file, res.join('\n'), 'utf-8');
+  fs.writeFileSync("tmp.js", res.join('\n'), 'utf-8');
+  // fs.writeFileSync(file, res.join('\n'), 'utf-8');
 
 }
 
@@ -124,7 +128,7 @@ const main = async () => {
     for (const file of files) {
       const stat = statSync(file);
       if (!stat.isFile()) continue;
-      if(file !== 'src/backup.ts') continue;
+      if(file !== 'src/database.ts') continue;
       processLineByLine(file);
     }
   } catch (err) {
