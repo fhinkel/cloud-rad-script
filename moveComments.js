@@ -55,12 +55,12 @@ async function processLineByLine(file) {
     match = line.match(/^\s*(async )?([A-z]+)\(/); // functionName( or async functionName(
     if (match) {
       functionName = match[2];
-      console.log(line);
-      console.log(functionName);
+      // console.log(line);
+      // console.log(functionName);
       match = line.match(/^\s*(async )?([A-z]+)\(.*;|{$/); // functionName( or async functionName(  ending with ; or {
       if (match) {
-        match = line.match(/;$/);
-        data.push({ type: "signature", declaration: match ? true : false, name: functionName, data: [line] });
+        const declaration = line.match(/;$/);
+        data.push({ type: "signature", declaration, name: functionName, data: [line] });
       } else {
         insideSignature = true;
         signature.push(line);
@@ -72,8 +72,8 @@ async function processLineByLine(file) {
       match = line.match(/;|{$/); // ending with ; or { 
       if (match) {
         // console.log(signature);
-        match = line.match(/;$/);
-        data.push({ type: "signature", declaration: match ? true : false, name: functionName, data: signature });
+        const declaration = line.match(/;$/);
+        data.push({ type: "signature", declaration, name: functionName, data: signature });
         insideSignature = false;
         signature = [];
       }
@@ -101,6 +101,8 @@ async function processLineByLine(file) {
       }
     }
   }
+
+  res.push('');
 
   fs.writeFileSync("tmp.js", res.join('\n'), 'utf-8');
   // fs.writeFileSync(file, res.join('\n'), 'utf-8');
