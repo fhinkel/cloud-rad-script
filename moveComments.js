@@ -60,7 +60,7 @@ async function processLineByLine(file) {
       match = line.match(/^\s*(async )?([A-z]+)\(.*;|{$/); // functionName( or async functionName(  ending with ; or {
       if (match) {
         const invocation = line.match(/\);$/); // invocations don't have a return type before the semicolon
-        if(invocation) {
+        if (invocation) {
           data.push({ type: "none", data: line });
           continue;
         }
@@ -109,8 +109,8 @@ async function processLineByLine(file) {
 
   res.push('');
 
-  fs.writeFileSync("tmp.js", res.join('\n'), 'utf-8');
-  // fs.writeFileSync(file, res.join('\n'), 'utf-8');
+  // fs.writeFileSync("tmp.js", res.join('\n'), 'utf-8');
+  fs.writeFileSync(file, res.join('\n'), 'utf-8');
 
 }
 
@@ -124,10 +124,8 @@ const main = async () => {
     for (const file of files) {
       const stat = statSync(file);
       if (!stat.isFile()) continue;
-      if(file === 'src/codec.ts') {
-        console.log(file);
-        processLineByLine(file);
-      }
+      if(file !== 'src/backup.ts') continue;
+      processLineByLine(file);
     }
   } catch (err) {
     console.error(err);
