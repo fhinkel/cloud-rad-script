@@ -59,6 +59,11 @@ async function processLineByLine(file) {
       // console.log(functionName);
       match = line.match(/^\s*(async )?([A-z]+)\(.*;|{$/); // functionName( or async functionName(  ending with ; or {
       if (match) {
+        const invocation = line.match(/\);$/); // invocations don't have a return type before the semicolon
+        if(invocation) {
+          data.push({ type: "none", data: line });
+          continue;
+        }
         const declaration = line.match(/;$/);
         data.push({ type: "signature", declaration, name: functionName, data: [line] });
       } else {
@@ -104,8 +109,8 @@ async function processLineByLine(file) {
 
   res.push('');
 
-  // fs.writeFileSync("tmp.js", res.join('\n'), 'utf-8');
-  fs.writeFileSync(file, res.join('\n'), 'utf-8');
+  fs.writeFileSync("tmp.js", res.join('\n'), 'utf-8');
+  // fs.writeFileSync(file, res.join('\n'), 'utf-8');
 
 }
 
@@ -119,8 +124,10 @@ const main = async () => {
     for (const file of files) {
       const stat = statSync(file);
       if (!stat.isFile()) continue;
-      // if(file !== 'src/v1/spanner_client.ts') continue;
-      processLineByLine(file);
+      if(file === 'src/codec.ts') {
+        console.log(file);
+        processLineByLine(file);
+      }
     }
   } catch (err) {
     console.error(err);
