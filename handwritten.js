@@ -4,9 +4,9 @@ files = [
 "spanner", // open PR for comments
 "storage",
 "datastore", // open PR for comments, merged
-"trace", 
-"cloud-debug-nodejs", // script throws
-"logging", // blocked by open PR for links
+"trace", // no comments that need moving
+"cloud-debug-nodejs", // no comments that need moving, script throws because of closing comment before variable definition on same line
+"logging", // comments moved, blocked by open PR for links
 "logging-winston", // no comments to move
 "logging-bunyan", // no comments to move
 "compute", // open PR for fencing
