@@ -40,7 +40,7 @@ async function processLineByLine(file) {
     if (insideComment) {
       match = line.match(/^\s*\*/); //  *
       if (!match) {
-        throw new Error("expected a comment");
+        throw new Error("expected a comment " + line);
       }
       comment.push(line);
       match = line.match(/^\s*\*\//); //  */
@@ -55,6 +55,11 @@ async function processLineByLine(file) {
     match = line.match(/^\s*(async )?([A-z]+)\(/); // functionName( or async functionName(
     if (match) {
       functionName = match[2];
+      if(functionName === 'promisifySome') {
+        console.log(functionName);
+        data.push({ type: "none", data: line });
+        continue;
+      }
       // console.log(line);
       // console.log(functionName);
       match = line.match(/^\s*(async )?([A-z]+)\(.*;|{$/); // functionName( or async functionName(  ending with ; or {
